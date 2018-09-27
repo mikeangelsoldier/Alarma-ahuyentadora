@@ -8,7 +8,7 @@
 
  ***********************************************/
 
-#include <avr/sleep.h> //incluimos la libreria para AVR sleep
+#include <LowPower.h>//añadir al libreria para poner al arduino en bajo consumo de energia
 
 /****************               CONSTANTES                     *******************/
 #define BOTON_PUERTA 3                    //Botón que simula el cierre y apertura de una puerta
@@ -151,7 +151,6 @@ volatile int tonoActual = 1;                // Variable usada por la interrupci�
 
 
 void setup() {
-  //set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
   //modo de los pines necesarios
   pinMode(BOTON_PUERTA, INPUT_PULLUP);
@@ -168,7 +167,10 @@ void setup() {
   //  Las interrupciones a utilizar:
   attachInterrupt(digitalPinToInterrupt(BOTON_PUERTA), interrupcionAlarma, RISING);   //rising es el modo de disparo que activara la interrupcion
   attachInterrupt(digitalPinToInterrupt(BOTON_TONO),interrupcionTono , RISING);   //rising es el modo de disparo que activara la interrupcion
+  
   Serial.begin(9600);
+
+  
 }
 
 void loop() {
@@ -205,9 +207,9 @@ void loop() {
         melodiaAlarma(SEVEN_NATION_ARMY, TIEMPOS_SEVEN_NATION_ARMY, 32);//se indica la melodia para alarma, con sus notas, la duración (tiempos) de cada nota y el tamaño de melodia)
         break;
     }
-  } else {          //Si el botón se vuelve a presionar se debe de apagar la alarma y los LED del display 7 segmentos
+  } else {                                            //Si el botón se vuelve a presionar se debe de apagar la alarma y los LED del display 7 segmentos
     //puede darse el caso que un tono de alarma sea muy largo y por eso se debe de esperar a que termine el sonido para reproducir tono que fin:
-    if (!alarmaApagada) {     //Solo si la alarma no se ha apagado aun reproducirá el tono de apagado
+    if (!alarmaApagada) {                         //Solo si la alarma no se ha apagado aun reproducirá el tono de apagado
       tone(BOCINA, 600.25, 250);
       delay(250);
       noTone(BOCINA);
@@ -215,22 +217,23 @@ void loop() {
       tone(BOCINA, 987.77, 400);
       delay(400);
       noTone(BOCINA);
-      alarmaApagada = true;   //Indicamos que ya alarma termino de reproducirse o escucharse
+      alarmaApagada = true;                             //Indicamos que ya alarma termino de reproducirse o escucharse
+      mostrarNumTono(0, 0, 0, 0, 0, 0, 0);
+      LowPower.powerDown(SLEEP_FOREVER,ADC_OFF,BOD_OFF);// coloca al arduino en bajo consumo de energia, vuelve a estado normal con una interrupción
     }
 
     //apagamos cualquier sonido que pudiera haber continuado asi como apagar el display:
     noTone(BOCINA);
     digitalWrite(LED_ALARMA, LOW);
     mostrarNumTono(0, 0, 0, 0, 0, 0, 0);
+    
   }
-
-
 }
 
 void interrupcionAlarma() {
   /*Este método es usado cuando se activa la interrupcion al presionar el BOTON_PUERTA para activar la alarma
     (El botón simula que se abre una puerta al presionarlo, y nuevamente al volver a presionarlo simula el cierre de la puerta)*/
-  
+    
 
   /*Condicional para eliminar el rebote de la interrupción:   */
   if (millis() > contadorTiempo + TIEMPO_DE_UMBRAL) {
@@ -330,9 +333,6 @@ void melodiaAlarma(double notas[], int tiempos[], int tamano) {
     tone(BOCINA, notas[notaActual]);        //da el tono a la frecuencia de la nota en ese momento
     delay(tiempos[notaActual]);             //se mantiene con la nota el tiempo definido para esa nota
     noTone(BOCINA);                         //finaliza esa nota para reproducir la sig nota de la melodia
-    /*if(botonPresionado){
-      notaActual=tamanoMelodia;
-      }*/
   }
 }
 
