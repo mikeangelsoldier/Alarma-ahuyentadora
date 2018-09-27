@@ -69,7 +69,7 @@ Armar el circuito tal como se muestra en la seccion de **Vista del circuito arma
 
 ## Diagrama del circuito.
 Diagrama de circuito: 
-![alt text](https://github.com/mikeangelsoldier/Alarma-ahuyentadora/blob/master/imagenes/diagrama.png "Imagen Circuito")
+![alt text](https://github.com/mikeangelsoldier/Alarma-ahuyentadora/blob/master/imagenes/diagrama2.png "Imagen Circuito")
 
 
 
